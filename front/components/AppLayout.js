@@ -1,84 +1,45 @@
-import { useSelector } from "react-redux";
+import React from "react";
+import Link from "next/link";
 import PropTypes from "prop-types";
-import Link from "next/link"; // 링크 컴포넌트
-import { Menu, Input, Row, Col } from "antd";
-import { createGlobalStyle } from "styled-components";
+import { Col, Input, Menu, Row } from "antd";
+import { useSelector } from "react-redux";
 
-import styled from "styled-components";
-import UserProfile from "../components/UserProfile";
-import LoginForm from "../components/LoginForm";
-
-const Global = createGlobalStyle`
-.ant-row {
-    margin-right: 0 !important;
-    margin-left: 0 !important;
-  }
-  
-  .ant-col:first-child {
-      padding-left: 0 !important;
-  }
-  
-  .ant-col:last-child {
-    padding-right: 0 !important;
-  }
-`;
-
-const SearchInput = styled(Input.Search)`
-  vertical-align: "middle";
-`;
+import LoginForm from "./LoginForm";
+import UserProfile from "./UserProfile";
 
 const AppLayout = ({ children }) => {
   const { me } = useSelector((state) => state.user);
-
   return (
     <div>
-      <Global />
-      <Menu
-        mode="horizontal"
-        items={[
-          {
-            label: (
-              <Link href="/">
-                <a>노드버드</a>
-              </Link>
-            ),
-            key: "/",
-          },
-          {
-            label: (
-              <Link href="/profile">
-                <a> 프로필</a>
-              </Link>
-            ),
-            key: "/profile",
-          },
-          { label: <SearchInput enterButton />, key: "/search" },
-          {
-            label: (
-              <Link href="/signup">
-                <a>회원가입</a>
-              </Link>
-            ),
-            key: "/signup",
-          },
-        ]}
-      />
-
+      <Menu mode="horizontal">
+        <Menu.Item key="home">
+          <Link href="/">
+            <a>노드버드</a>
+          </Link>
+        </Menu.Item>
+        <Menu.Item key="profile">
+          <Link href="/profile">
+            <a>프로필</a>
+          </Link>
+        </Menu.Item>
+        <Menu.Item key="mail">
+          <Input.Search enterButton style={{ verticalAlign: "middle" }} />
+        </Menu.Item>
+      </Menu>
       <Row gutter={8}>
         <Col xs={24} md={6}>
-          {me && <UserProfile />}
-          {!me && <LoginForm />}
+          {me ? <UserProfile /> : <LoginForm />}
         </Col>
         <Col xs={24} md={12}>
           {children}
         </Col>
         <Col xs={24} md={6}>
           <a
-            href="https://github.com/katf101"
-            target="_blacnk"
+            href="https://www.zerocho.com"
+            target="_blank"
             rel="noreferrer noopener"
           >
-            My github
+            Made by ZeroCho
           </a>
         </Col>
       </Row>
@@ -86,16 +47,6 @@ const AppLayout = ({ children }) => {
   );
 };
 
-// {isLoggedIn && <UserProfile setIsLoggedIn={setIsLoggedIn} />}
-// {!isLoggedIn && <LoginForm setIsLoggedIn={setIsLoggedIn} />}
-
-// {isLoggedIn ? (
-//     <UserProfile />
-//   ) : (
-//     <LoginForm setIsLoggedIn={setIsLoggedIn} />
-//   )}
-
-// 전달받은 데이터의 유효성을 검증
 AppLayout.propTypes = {
   children: PropTypes.node.isRequired,
 };

@@ -1,12 +1,4 @@
-import {
-  all,
-  fork,
-  call,
-  put,
-  takeEvery,
-  takeLatest,
-  delay,
-} from "redux-saga/effects"; // 사가 이펙트
+import { all, fork } from "redux-saga/effects"; // 사가 이펙트
 
 import postSaga from "./post";
 import userSaga from "./user";
@@ -28,8 +20,5 @@ import userSaga from "./user";
 // Post
 
 export default function* rootSaga() {
-  yield all([
-    fork(postSaga), // call
-    fork(userSaga),
-  ]);
+  yield all([fork(postSaga), fork(userSaga)]);
 }

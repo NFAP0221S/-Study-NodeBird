@@ -1,4 +1,4 @@
-import { delay, put, all, fork, takeLatest } from "redux-saga/effects";
+import { all, delay, fork, put, takeLatest } from "redux-saga/effects";
 import axios from "axios";
 
 import {
@@ -24,19 +24,17 @@ function logInAPI(data) {
   return axios.post("/api/login", data);
 }
 
-// const l = logIn({ type: "LOG_IN_REQUEST", data: { id: "zerocho@gmail.com" } });
-// l.next();
-// l.next();
-
 function* logIn(action) {
   try {
-    // const result = yield call(logInAPI, action.data);
-    yield delay(1000); // 가짜
+    console.log("saga logIn");
+    // const result = yield call(logInAPI);
+    yield delay(1000);
     yield put({
       type: LOG_IN_SUCCESS,
       data: action.data,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: LOG_IN_FAILURE,
       error: err.response.data,
@@ -55,9 +53,9 @@ function* logOut() {
     yield delay(1000);
     yield put({
       type: LOG_OUT_SUCCESS,
-      //   data: result.data,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: LOG_OUT_FAILURE,
       error: err.response.data,
@@ -76,14 +74,64 @@ function* signUp() {
     yield delay(1000);
     yield put({
       type: SIGN_UP_SUCCESS,
-      //   data: result.data,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: SIGN_UP_FAILURE,
       error: err.response.data,
     });
   }
+}
+
+function followAPI() {
+  return axios.post("/api/follow");
+}
+
+function* follow(action) {
+  try {
+    // const result = yield call(followAPI);
+    yield delay(1000);
+    yield put({
+      type: FOLLOW_SUCCESS,
+      data: action.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: FOLLOW_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+function unfollowAPI() {
+  return axios.post("/api/unfollow");
+}
+
+function* unfollow(action) {
+  try {
+    // const result = yield call(unfollowAPI);
+    yield delay(1000);
+    yield put({
+      type: UNFOLLOW_SUCCESS,
+      data: action.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: UNFOLLOW_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+function* watchFollow() {
+  yield takeLatest(FOLLOW_REQUEST, follow);
+}
+
+function* watchUnfollow() {
+  yield takeLatest(UNFOLLOW_REQUEST, unfollow);
 }
 
 function* watchLogIn() {
@@ -99,5 +147,11 @@ function* watchSignUp() {
 }
 
 export default function* userSaga() {
-  yield all([fork(watchLogIn), fork(watchLogOut), fork(watchSignUp)]);
+  yield all([
+    fork(watchFollow),
+    fork(watchUnfollow),
+    fork(watchLogIn),
+    fork(watchLogOut),
+    fork(watchSignUp),
+  ]);
 }
