@@ -1,4 +1,4 @@
-const Sequelize = require(sequelize);
+const Sequelize = require("sequelize");
 const env = process.env.NODE_ENV || "development"; // 환경변수로 NODE_ENV, 기본값 'development'
 const config = require("../config/config")[env]; // 즉 config 폴더의 config.json 안의 development 값들을 가져옴
 const db = {};
@@ -11,6 +11,14 @@ const sequelize = new Sequelize(
   config
 );
 
+// 리콰이어 후 실행 해줌
+db.Comment = require("./comment")(sequelize, Sequelize);
+db.Hashtag = require("./Hashtag")(sequelize, Sequelize);
+db.Image = require("./Image")(sequelize, Sequelize);
+db.Post = require("./Post")(sequelize, Sequelize);
+db.User = require("./User")(sequelize, Sequelize);
+
+// 각 테이블의 associate를 반복문으로 실행
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
     db[modelName].associate(db);

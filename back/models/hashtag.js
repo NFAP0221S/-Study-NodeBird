@@ -9,11 +9,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       charset: "utf8mb4",
-      collate: "utf8_general_ci",
+      collate: "utf8mb4_general_ci",
     }
   );
   Hashtag.associate = (db) => {
-    db.Hashtag.belongsToMany(db.Post); // 해쉬태그 N : 게시글 N
+    db.Hashtag.belongsToMany(db.Post, { through: "PostHashtag" }); // 해쉬태그 N : 게시글 N
   };
   return Hashtag;
 };
