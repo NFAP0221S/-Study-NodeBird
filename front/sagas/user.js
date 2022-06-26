@@ -21,20 +21,16 @@ import {
 
 // 로그인
 function logInAPI(data) {
-  return axios.post("/api/login", data);
+  return axios.post("/user/login", data);
 }
-
 function* logIn(action) {
   try {
-    console.log("saga logIn");
-    // const result = yield call(logInAPI);
-    yield delay(1000);
+    const result = yield call(logInAPI, action.data);
     yield put({
       type: LOG_IN_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
   } catch (err) {
-    console.error(err);
     yield put({
       type: LOG_IN_FAILURE,
       error: err.response.data,
@@ -44,7 +40,7 @@ function* logIn(action) {
 
 // 로그아웃
 function logOutAPI() {
-  return axios.post("/api/logout");
+  return axios.post("/logout");
 }
 
 function* logOut() {
@@ -65,10 +61,10 @@ function* logOut() {
 
 // 회원가입
 function signUpAPI(data) {
-  return axios.post("http://localhost:3065/user", data);
+  return axios.post("/user", data);
 }
 
-function* signUp() {
+function* signUp(action) {
   try {
     const result = yield call(signUpAPI, action.data);
     console.log(result);
@@ -76,7 +72,7 @@ function* signUp() {
       type: SIGN_UP_SUCCESS,
     });
   } catch (err) {
-    console.error(err, "에러");
+    console.error(err);
     yield put({
       type: SIGN_UP_FAILURE,
       error: err.response.data,

@@ -10,7 +10,9 @@ import useInput from "../hooks/useInput";
 
 const Signup = () => {
   const dispatch = useDispatch();
-  const { signUpLoading, me } = useSelector((state) => state.user);
+  const { signUpLoading, signUpDone, signUpError } = useSelector(
+    (state) => state.user
+  );
 
   const [passwordCheck, setPasswordCheck] = useState("");
   const [term, setTerm] = useState(false);
@@ -21,12 +23,25 @@ const Signup = () => {
   const [nickname, onChangeNick] = useInput("");
   const [password, onChangePassword] = useInput("");
 
+  // useEffect(() => {
+  //   if (me) {
+  //     alert("로그인했으니 메인페이지로 이동합니다.");
+  //     Router.push("/");
+  //   }
+  // }, [me && me.id]);
+
   useEffect(() => {
-    if (me) {
+    if (signUpDone) {
       alert("로그인했으니 메인페이지로 이동합니다.");
       Router.push("/");
     }
-  }, [me && me.id]);
+  }, [signUpDone]);
+
+  useEffect(() => {
+    if (signUpError) {
+      alert(signUpError);
+    }
+  }, [signUpError]);
 
   const onSubmit = useCallback(() => {
     if (password !== passwordCheck) {

@@ -3,6 +3,7 @@ const cors = require("cors");
 const postRouter = require("./routes/post");
 const userRouter = require("./routes/user");
 const db = require("./models");
+const passportConfig = require("./passport");
 
 const app = express();
 // 서버 실행후 db 와 시퀄라이즈 연결
@@ -12,6 +13,8 @@ db.sequelize
     console.log("db 연결 성공");
   })
   .catch(console.error);
+
+passportConfig();
 
 // 미들웨어
 app.use(
@@ -27,21 +30,21 @@ app.get("/", (req, res) => {
   res.send("hello express");
 });
 
-app.get("/", (req, res) => {
-  res.send("hello api");
-});
+// app.get("/", (req, res) => {
+//   res.send("hello api");
+// });
 
-app.get("/posts", (req, res) => {
-  res.send("hello api");
-});
+// app.get("/posts", (req, res) => {
+//   res.send("hello api");
+// });
 
-app.get("/posts", (req, res) => {
-  res.json([
-    { id: 1, content: "hello1" },
-    { id: 2, content: "hello2" },
-    { id: 3, content: "hello3" },
-  ]);
-});
+// app.get("/posts", (req, res) => {
+//   res.json([
+//     { id: 1, content: "hello1" },
+//     { id: 2, content: "hello2" },
+//     { id: 3, content: "hello3" },
+//   ]);
+// });
 
 app.use("/post", postRouter);
 app.use("/user", userRouter);
