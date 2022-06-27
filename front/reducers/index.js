@@ -4,20 +4,20 @@ import { combineReducers } from "redux";
 import user from "./user";
 import post from "./post";
 
-// 루트 리듀서
-const rootReducer = combineReducers({
-  // 서버 사이드 렌더링을 위해서 HYDRATE 추가, 원래는 index 없어도 됨
-  index: (state = {}, action) => {
-    switch (action.type) {
-      case HYDRATE:
-        console.log("HYDRATE", action);
-        return { ...state, ...action.payload };
-      default:
-        return state;
+// (이전상태, 액션) => 다음상태
+const rootReducer = (state, action) => {
+  switch (action.type) {
+    case HYDRATE:
+      console.log("HYDRATE", action);
+      return action.payload;
+    default: {
+      const combinedReducer = combineReducers({
+        user,
+        post,
+      });
+      return combinedReducer(state, action);
     }
-  },
-  user,
-  post,
-});
+  }
+};
 
 export default rootReducer;

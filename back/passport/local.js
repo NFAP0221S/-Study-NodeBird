@@ -1,6 +1,6 @@
-const passport = requrie("passport");
+const passport = require("passport");
 const { Strategy: LocalStrategy } = require("passport-local");
-const bcrypt = requrie("bcrypt");
+const bcrypt = require("bcrypt");
 const { User } = require("../models");
 
 // 패스포트로 로그인하기
@@ -22,7 +22,7 @@ module.exports = () => {
           const result = await bcrypt.compare(password, user.password); // compare 는 비동기 함수
           // 비밀번호가 일치하면
           if (result) {
-            // 로그인 성공
+            // 로그인 성공, done 되는 순간 콜백실행 되어 routes -> user.js
             return done(null, user);
           }
           return done(null, false, { reason: "비밀번호가 틀렸습니다." });
