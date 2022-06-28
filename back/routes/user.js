@@ -3,11 +3,46 @@ const bcrypt = require("bcrypt");
 const passport = require("passport");
 
 const { User, Post } = require("../models");
-const { isLoggendIn, isNotLoggedIn } = require("./middlewares");
-
-// const db = require("../models");
+const { isLoggedIn, isNotLoggedIn } = require("./middlewares");
 
 const router = express.Router();
+
+// GET / user
+router.get("/user", async (req, res, next) => {
+  try {
+    if (req.user) {
+      const fullUserWithoutPassword = await User.findOne({
+        where: { id: req.user.id },
+        // 전체 데이터 중에서 비밀번호 빼고만 가져옴
+        attributes: {
+          exclude: ["password"],
+        },
+        include: [
+          {
+            model: Post,
+            attributes: ["id"],
+          },
+          {
+            model: User,
+            as: "Followings",
+            attributes: ["id"],
+          },
+          {
+            model: User,
+            as: "Followers",
+            attributes: ["id"],
+          },
+        ],
+      });
+      res.status(200).json(fullUserWithoutPassword);
+    } else {
+      res.status(200).json(null);
+    }
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
 
 // login
 router.post("/login", isNotLoggedIn, (req, res, next) => {
@@ -37,14 +72,17 @@ router.post("/login", isNotLoggedIn, (req, res, next) => {
         include: [
           {
             model: Post,
+            attributes: ["id"],
           },
           {
             model: User,
             as: "Followings",
+            attributes: ["id"],
           },
           {
             model: User,
             as: "Followers",
+            attributes: ["id"],
           },
         ],
       });
@@ -82,7 +120,7 @@ router.post("/", isNotLoggedIn, async (req, res, next) => {
 });
 
 // logout
-router.post("/logout", isLoggendIn, (req, res) => {
+router.post("/logout", isLoggedIn, (req, res) => {
   req.logout();
   req.session.destroy();
   res.send("ok");

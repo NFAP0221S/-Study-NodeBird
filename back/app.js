@@ -24,8 +24,8 @@ passportConfig();
 // 미들웨어
 app.use(
   cors({
-    origin: "*", // 모든 주소의 요청 허용
-    credentials: false,
+    origin: "http://localhost:3060", //  '*' 은 모든 주소의 요청 허용
+    credentials: true, // true 는 쿠키 전달
   })
 );
 app.use(express.json());
@@ -65,6 +65,13 @@ app.get("/", (req, res) => {
 
 app.use("/post", postRouter);
 app.use("/user", userRouter);
+
+// 마지막 에러처리 미들웨어
+// 에러처리 미들웨어는 마지막에서 기본적으로 실행된다.
+// 하지만 에러처리를 다르게 바꾸고 싶으면 코드 작성
+// app.use((err, req, res, next) => {
+
+// })
 
 app.listen(3065, () => {
   console.log("서버 실행 중!");

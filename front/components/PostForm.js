@@ -2,19 +2,15 @@ import React, { useCallback, useState, useEffect, useRef } from "react";
 import { Form, Input, Button } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 
-import { ADD_POST_REQUEST } from "../reducers/post";
+import { addPost } from "../reducers/post";
+import useInput from "../hooks/useInput";
 
 const PostForm = () => {
   const dispatch = useDispatch();
-  const [text, setText] = useState("");
+  const [text, onChangeText, setText] = useInput("");
   const { imagePaths, addPostLoading, addPostDone } = useSelector(
     (state) => state.post
   );
-
-  const imageInput = useRef();
-  const onClickImageUpload = useCallback(() => {
-    imageInput.current.click();
-  }, [imageInput.current]);
 
   useEffect(() => {
     if (addPostDone) {
@@ -22,22 +18,24 @@ const PostForm = () => {
     }
   }, [addPostDone]);
 
-  const onSubmitForm = useCallback(() => {
-    dispatch({
-      type: ADD_POST_REQUEST,
-      data: text,
-    });
+  const onSubmit = useCallback(() => {
+    dispatch(addPost(text));
   }, [text]);
 
-  const onChangeText = useCallback((e) => {
-    setText(e.target.value);
-  }, []);
+  const imageInput = useRef();
+  const onClickImageUpload = useCallback(() => {
+    imageInput.current.click();
+  }, [imageInput.current]);
+
+  // const onChangeText = useCallback((e) => {
+  //   setText(e.target.value);
+  // }, []);
 
   return (
     <Form
       style={{ margin: "10px 0 20px" }}
       encType="multipart/form-data"
-      onFinish={onSubmitForm}
+      onFinish={onSubmit}
     >
       <Input.TextArea
         maxLength={140}

@@ -23,6 +23,7 @@ const Signup = () => {
   const [nickname, onChangeNick] = useInput("");
   const [password, onChangePassword] = useInput("");
 
+  // 로그인하면 회원가입 화면 사라지기
   useEffect(() => {
     if (me && me.id) {
       // alert("로그인했으니 메인페이지로 이동합니다.");
