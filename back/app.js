@@ -4,8 +4,10 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const dotenv = require("dotenv");
+const morgan = require("morgan");
 
 const postRouter = require("./routes/post");
+const postsRouter = require("./routes/posts");
 const userRouter = require("./routes/user");
 const db = require("./models");
 const passportConfig = require("./passport");
@@ -22,6 +24,9 @@ db.sequelize
 passportConfig();
 
 // 미들웨어
+
+app.use(morgan("dev")); // 프론트에서 백엔드로 요청을 보낼 때 어떤 요청을 보냈는지 기록을 보냄
+
 app.use(
   cors({
     origin: "http://localhost:3060", //  '*' 은 모든 주소의 요청 허용
@@ -47,22 +52,7 @@ app.get("/", (req, res) => {
   res.send("hello express");
 });
 
-// app.get("/", (req, res) => {
-//   res.send("hello api");
-// });
-
-// app.get("/posts", (req, res) => {
-//   res.send("hello api");
-// });
-
-// app.get("/posts", (req, res) => {
-//   res.json([
-//     { id: 1, content: "hello1" },
-//     { id: 2, content: "hello2" },
-//     { id: 3, content: "hello3" },
-//   ]);
-// });
-
+app.use("/posts", postsRouter);
 app.use("/post", postRouter);
 app.use("/user", userRouter);
 

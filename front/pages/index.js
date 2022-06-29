@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useInView } from "react-intersection-observer";
 
 import PostForm from "../components/PostForm";
 import PostCard from "../components/PostCard";
@@ -10,9 +11,10 @@ import { LOAD_USER_REQUEST } from "../reducers/user";
 const Home = () => {
   const dispatch = useDispatch();
   const { me } = useSelector((state) => state.user);
-  const { mainPosts, hasMorePost, loadPostsLoading } = useSelector(
+  const { mainPosts, hasMorePosts, loadPostsLoading } = useSelector(
     (state) => state.post
   );
+  const [ref, inView] = useInView();
 
   useEffect(() => {
     dispatch({
@@ -41,7 +43,7 @@ const Home = () => {
     return () => {
       window.removeEventListener("scroll", onScroll);
     };
-  }, [mainPosts, hasMorePost, loadPostsLoading]);
+  }, [mainPosts, hasMorePosts, loadPostsLoading]);
 
   return (
     <AppLayout>
@@ -49,6 +51,10 @@ const Home = () => {
       {mainPosts.map((post) => (
         <PostCard key={post.id} post={post} />
       ))}
+      <div
+        ref={hasMorePosts && !loadPostsLoading ? ref : undefined}
+        style={{ height: 10 }}
+      />
     </AppLayout>
   );
 };
