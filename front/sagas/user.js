@@ -1,4 +1,4 @@
-import { all, delay, fork, put, takeLatest, call } from "redux-saga/effects";
+import { all, fork, put, takeLatest, call } from "redux-saga/effects";
 import axios from "axios";
 
 import {
@@ -14,8 +14,6 @@ import {
   LOAD_FOLLOWINGS_FAILURE,
   LOAD_FOLLOWINGS_REQUEST,
   LOAD_FOLLOWINGS_SUCCESS,
-  LOAD_MY_INFO_REQUEST,
-  LOAD_MY_INFO_SUCCESS,
   LOAD_USER_FAILURE,
   LOAD_USER_REQUEST,
   LOAD_USER_SUCCESS,
@@ -34,13 +32,72 @@ import {
   UNFOLLOW_FAILURE,
   UNFOLLOW_REQUEST,
   UNFOLLOW_SUCCESS,
-  LOAD_MY_INFO_FAILURE,
 } from "../reducers/user";
 
-// changeNickname
+function removeFollowerAPI(data) {
+  return axios.delete(`/user/follower/${data}`);
+}
+
+function* removeFollower(action) {
+  try {
+    const result = yield call(removeFollowerAPI, action.data);
+    yield put({
+      type: REMOVE_FOLLOWER_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: REMOVE_FOLLOWER_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+function loadFollowersAPI(data) {
+  return axios.get("/user/followers", data);
+}
+
+function* loadFollowers(action) {
+  try {
+    const result = yield call(loadFollowersAPI, action.data);
+    yield put({
+      type: LOAD_FOLLOWERS_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_FOLLOWERS_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+function loadFollowingsAPI(data) {
+  return axios.get("/user/followings", data);
+}
+
+function* loadFollowings(action) {
+  try {
+    const result = yield call(loadFollowingsAPI, action.data);
+    yield put({
+      type: LOAD_FOLLOWINGS_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_FOLLOWINGS_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
 function changeNicknameAPI(data) {
   return axios.patch("/user/nickname", { nickname: data });
 }
+
 function* changeNickname(action) {
   try {
     const result = yield call(changeNicknameAPI, action.data);
@@ -57,14 +114,13 @@ function* changeNickname(action) {
   }
 }
 
-// LoadUser
-function loadUserAPI(data) {
-  return axios.get(`/user/${data}`);
+function loadUserAPI() {
+  return axios.get("/user");
 }
+
 function* loadUser(action) {
   try {
     const result = yield call(loadUserAPI, action.data);
-    console.log("loadUserData", result.data);
     yield put({
       type: LOAD_USER_SUCCESS,
       data: result.data,
@@ -78,10 +134,10 @@ function* loadUser(action) {
   }
 }
 
-// 로그인
 function logInAPI(data) {
   return axios.post("/user/login", data);
 }
+
 function* logIn(action) {
   try {
     const result = yield call(logInAPI, action.data);
@@ -98,7 +154,6 @@ function* logIn(action) {
   }
 }
 
-// 로그아웃
 function logOutAPI() {
   return axios.post("/user/logout");
 }
@@ -118,7 +173,6 @@ function* logOut() {
   }
 }
 
-// 회원가입
 function signUpAPI(data) {
   return axios.post("/user", data);
 }
@@ -139,7 +193,6 @@ function* signUp(action) {
   }
 }
 
-// 팔로우
 function followAPI(data) {
   return axios.patch(`/user/${data}/follow`);
 }
@@ -180,6 +233,18 @@ function* unfollow(action) {
   }
 }
 
+function* watchRemoveFollower() {
+  yield takeLatest(REMOVE_FOLLOWER_REQUEST, removeFollower);
+}
+
+function* watchLoadFollowers() {
+  yield takeLatest(LOAD_FOLLOWERS_REQUEST, loadFollowers);
+}
+
+function* watchLoadFollowings() {
+  yield takeLatest(LOAD_FOLLOWINGS_REQUEST, loadFollowings);
+}
+
 function* watchChangeNickname() {
   yield takeLatest(CHANGE_NICKNAME_REQUEST, changeNickname);
 }
@@ -210,6 +275,9 @@ function* watchSignUp() {
 
 export default function* userSaga() {
   yield all([
+    fork(watchRemoveFollower),
+    fork(watchLoadFollowers),
+    fork(watchLoadFollowings),
     fork(watchChangeNickname),
     fork(watchLoadUser),
     fork(watchFollow),
@@ -217,11 +285,5 @@ export default function* userSaga() {
     fork(watchLogIn),
     fork(watchLogOut),
     fork(watchSignUp),
-
-    // fork(watchRemoveFollower),
-    // fork(watchLoadFollowers),
-    // fork(watchLoadFollowings),
-    // fork(watchChangeNickname),
-    // fork(watchLoadUser),
   ]);
 }

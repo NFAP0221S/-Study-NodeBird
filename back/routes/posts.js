@@ -1,23 +1,28 @@
 const express = require("express");
+const { Op } = require("sequelize");
 
 const { Post, Image, User, Comment } = require("../models");
 
 const router = express.Router();
 
-// GET /posts
 router.get("/", async (req, res, next) => {
+  // GET /posts
   try {
+    const where = {};
+    if (parseInt(req.query.lastId, 10)) {
+      // 초기 로딩이 아닐 때
+      where.id = { [Op.lt]: parseInt(req.query.lastId, 10) };
+    } // 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1
     const posts = await Post.findAll({
-      // where,
-      //   offset: 10, // limit이 10이고,offset이 10이면 11부터 20까지 가져오기,100이면 101부터 110 가져오기
-      limit: 10, // 게시글 10개 가져오기
+      where,
+      limit: 10,
       order: [
-        ["createdAt", "DESC"], // 게시글 생성일 기준으로 내림차순 정렬
-        [Comment, "createdAt", "DESC"], // 2차적으로 댓글을 내림차순 정렬
+        ["createdAt", "DESC"],
+        [Comment, "createdAt", "DESC"],
       ],
       include: [
         {
-          model: User, // include의 user는 password 제외
+          model: User,
           attributes: ["id", "nickname"],
         },
         {
@@ -27,15 +32,28 @@ router.get("/", async (req, res, next) => {
           model: Comment,
           include: [
             {
-              model: Uder,
+              model: User,
               attributes: ["id", "nickname"],
             },
           ],
         },
         {
-          model: User, //좋아요 누른 사람
+          model: User, // 좋아요 누른 사람
           as: "Likers",
           attributes: ["id"],
+        },
+        {
+          model: Post,
+          as: "Retweet",
+          include: [
+            {
+              model: User,
+              attributes: ["id", "nickname"],
+            },
+            {
+              model: Image,
+            },
+          ],
         },
       ],
     });

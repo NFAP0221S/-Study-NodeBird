@@ -18,8 +18,11 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
-      charset: "utf8", // 한글사용
+      modelName: "User",
+      tableName: "users",
+      charset: "utf8",
       collate: "utf8_general_ci", // 한글 저장
+      sequelize,
     }
   );
   // 관계 작성
